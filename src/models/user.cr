@@ -1,6 +1,8 @@
 require "moongoon"
 require "blake3"
 require "regex"
+require "json"
+require "bson"
 
 require "../constants.cr"
 
@@ -16,6 +18,7 @@ class User < Moongoon::Collection
   property phone_number : String # Номер телефона. Формат: +7-(xxx)-xxx-xx-xx
   property email : String # Электронная почта. Формат: [A-Za-z0-9.+\-_]+@([a-z0-9]+\.)+[a-z]+
   property login : String # Логин. Формат: [A-Za-z0-9.\-_]
+
   property password_hash : String = ""
 
   def set_password(password : String) : Bool
@@ -45,23 +48,18 @@ class User < Moongoon::Collection
   def valid? : Bool
     # Валидация ФИО
     return false if App::REGEX_LAST_MIDDLE_NAME.match(@last_name).nil? || (!@middle_name.nil? && App::REGEX_LAST_MIDDLE_NAME.match(@middle_name.not_nil!).nil?) || App::REGEX_FIRST_NAME.match(@first_name).nil?
-    Log.info {"fio ok"}
 
     # Валидация номера телефона
     return false if App::REGEX_PHONE_NUMBER.match(@phone_number).nil?
-    Log.info {"phone ok"}
 
     # Валидация электронной почты
     return false if App::REGEX_EMAIL.match(@email).nil?
-    Log.info {"mail ok"}
 
     # Валидация логина
     return false if App::REGEX_LOGIN.match(@login).nil?
-    Log.info {"login ok"}
 
     # Валидация пароля
-    return false if @password_hash.bytesize == 0
-    Log.info {"password hash ok"}
+    return false unless @password_hash.bytesize == 64
 
     true
   end
@@ -70,7 +68,40 @@ class User < Moongoon::Collection
     # TODO: выслать e-mail :S
   end
 
-  def from_string(s : String)
-    # TODO: сериализация из текстового файла
+  def self.from_csv(s : String) : User?
+    split = s.split(',')
+    return nil if split.size != 7
+
+    middle_name : String?
+    last_name, first_name, middle_name, phone_number, email, login, password_hash = split
+    middle_name = nil if middle_name.size == 0
+
+    u = User.new(last_name: last_name, first_name: first_name, middle_name: middle_name, phone_number: phone_number, email: email, login: login, password_hash: password_hash)
+    return nil unless u.valid?
+
+    begin
+      u.insert
+    rescue ex
+      Log.debug { ex.message }
+      return nil
+    end
+
+    return u
+  end
+
+  def to_csv : String
+    "#{@last_name},#{@first_name},#{@middle_name},#{@phone_number},#{@email},#{@login},#{@password_hash}"
+  end
+
+  def to_frontend_json # Функция, выводящая общеизвестную информацию о пользователе. На данный момент бесполезна ибо любой желающий может экспортировать *всю* базу в CSV на блюдечке с голубой каёмочкой
+    {
+      last_name: @last_name,
+      first_name: @first_name,
+      middle_name: @middle_name,
+
+      phone_number: @phone_number,
+      email: @email,
+      login: @login
+    }
   end
 end

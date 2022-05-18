@@ -187,6 +187,11 @@ section.active
 display: block;
 }
 
+section#section-all
+{
+padding: 0;
+}
+
 canvas
 {
 display: block;

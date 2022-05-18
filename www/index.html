@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Rodent Enjoyer Server</title>
+	<title>Летняя Практика 4</title>
 	<link href="material-icons.css" rel="stylesheet">
 	<link href="material-icons-outlined.css" rel="stylesheet">
 	<style>
@@ -403,54 +403,60 @@ color: var(--md-sys-color-on-background);
 
 <body class="body1">
 	<nav>
-		<a href="https://github.com/SpadesX/SpadesX" id="nav-logo"><img src="logo.png" width="48px" height="48px" alt="SpadesX Logo"></a>
-<!-- todo: make it a fab		<button class="button icon" title="Join now!">
-			<span class="material-icons">
-				<div class="ripple"></div>
-				play_arrow
-			</span>
-			PLAY
-		</button>-->
-		<a class="button icon" href="#players" id="players" title="Players on this server">
+		<a class="button icon" href="#all" id="all" title="Все пользователи">
 			<span class="material-icons-conditional">
 				person
 			</span>
-			Players
+			Люди
 			<div class="ripple"></div>
 		</a>
-		<a class="button icon" href="#chat" id="chat" title="Chat">
+		<a class="button icon" href="#search" id="search" title="Поиск по базе данных">
 			<span class="material-icons-conditional">
-				chat
+				search
 			</span>
-			Chat
+			Поиск
 			<div class="ripple"></div>
 		</a>
-		<a class="button icon" href="#leaderboard" id="leaderboard" title="Leaderboard">
+		<a class="button icon" href="#import" id="import" title="Импорт пользователей">
 			<span class="material-icons-conditional">
-				leaderboard
+				file_upload
 			</span>
-			Leaders
+			Импорт
 			<div class="ripple"></div>
 		</a>
-		<a class="button icon" href="#map" id="map" title="Leaderboard">
+		<a class="button icon" href="#export" id="export" title="Экспорт пользователей">
 			<span class="material-icons-conditional">
-				map
+				file_download
 			</span>
-			Map
+			Экспорт
 			<div class="ripple"></div>
 		</a>
-		<a class="button icon" href="#info" id="info" title="About this server">
+		<a class="button icon" href="#info" id="info" title="Об этом проекте">
 			<span class="material-icons-conditional">
 				info
 			</span>
-			About
+			Авторы
 			<div class="ripple"></div>
 		</a>
 	</nav>
 	<main>
-		<section id="section-leaderboard">
+		<section id="section-all">
+			<table class="fullscreen">
+				<thead>
+					<tr>
+						<th id="all-0" class="active" onclick="switchSortAll(this)">Фамилия<span class="material-icons">arrow_downward</span></th>
+						<th id="all-1">Имя<span class="material-icons"></span></th>
+						<th id="all-2">Отчество<span class="material-icons"></span></th>
+						<th id="all-3">Номер телефона<span class="material-icons"></span></th>
+						<th id="all-4">E-Mail<span class="material-icons"></span></th>
+						<th id="all-5">Логин<span class="material-icons"></span></th>
+					</tr>
+				</thead>
+				<tbody id="tbody-all">
+				</tbody>
+			</table>
 		</section>
-		<section id="section-players">
+		<section id="section-search">
 			<h1 class="headline1">Playing CTF for 25 hours.</h1>
 			<div class="table-wrapper">
 				<table>
@@ -483,18 +489,17 @@ color: var(--md-sys-color-on-background);
 				</table>
 			</div>
 		</section>
-		<section id="section-map">
-			<canvas id="canvas-map">
-				No canvas?
-			</canvas>
+		<section id="section-import">
+			<h1 class="headline1">Импорт данных</h1>
 		</section>
-		<section id="section-chat">
+		<section id="section-export">
+			<h1 class="headline1">Экспорт данных</h1>
 		</section>
 		<section id="section-info">
-			<h1 class="headline1" id="servertitle">...</h1>
-			<h5 class="headline5">Powered by <a href="https://github.com/SpadesX/SpadesX">SpadesX</a> <span id="spadesxversion">1.0</span></h2>
-			<p>Hosting Ace of Spades v<span id="aosversion">0.75</span> with <span id="about-playercount">32</span> slots for players since <span id="runningsince">today :/</span>.</p>
-			<p>SpadesX on Discord: <iframe src="https://discord.com/widget?id=826567666440601610&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe></p>
+			<h1 class="headline1">Summer Practice 4</h1>
+			<h5 class="headline5">Сделано Иваном Кузьменко и Дмитрием Тихоновым из группы 16/2 в 2022 году.</h2>
+			<p>Основано на фронтенде, сделанном для проекта <a href="https://github.com/SpadesX/SpadesX">SpadesX</a> мною же.</p>
+			<p>Как фронтенд, так и бэкенд распространяется под лицензией <strong>GNU AGPLv3</strong>. Используется шрифт эмодзи от Google.</p>
 		</section>
 	</main>
 
@@ -502,7 +507,15 @@ color: var(--md-sys-color-on-background);
 const buttons = document.querySelectorAll("nav>a");
 const sections = document.getElementsByTagName("section");
 
-var aboutData = {};
+let allSortDir = 0; // 0 - возрастание, 1 - убывание
+let allSortColumn = 'all-0';
+
+const id2dir = {'all-0': };
+
+function switchSortAll()
+{
+
+}
 
 function setSection(section = window.location.hash.substr(1))
 {
@@ -544,16 +557,6 @@ function setNotifs(buttonId, count)
 	badge.setAttribute("data-badge-count", s);
 }
 
-function renderAbout()
-{
-	// TODO: set some kind of a "ready" flag to avoid showing placeholder data
-	document.getElementsByTagName("title")[0].innerText = document.getElementById("servertitle").innerText = aboutData.name;
-	document.getElementById("spadesxversion").innerText = aboutData.server_version;
-	document.getElementById("aosversion").innerText = aboutData.game_version;
-	document.getElementById("about-playercount").innerText = aboutData.players_max;
-	document.getElementById("runningsince").innerText = new Date(aboutData.running_since * 1000).toLocalDateString();
-}
-
 function loadAbout()
 {
 	fetch("/api/info")
@@ -563,7 +566,7 @@ function loadAbout()
 
 window.onload = () =>
 {
-	loadAbout();
+	//loadAbout();
 };
 
 buttons.forEach((button)=>{button.onclick=()=>setSection(button.id)});
