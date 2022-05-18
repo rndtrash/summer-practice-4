@@ -1,0 +1,13 @@
+# Crystal
+#/docs/
+/lib/
+/bin/
+/.shards/
+*.dwarf
+
+# Sentry (https://github.com/samueleaton/sentry)
+/dev/
+/sentry
+
+# Settings
+/.env

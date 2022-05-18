@@ -1,0 +1,31 @@
+name: sp4
+version: 0.1.0
+
+dependencies:
+  action-controller:
+    github: spider-gazelle/action-controller
+    version: ~> 4.0
+  active-model:
+    github: spider-gazelle/active-model
+    version: ~> 3.0
+  future:
+    github: crystal-community/future.cr
+    version: ~> 1.0
+  # Extends ENV to read values injected by docker and kubernetes secrets
+  secrets-env:
+    github: place-labs/secrets-env
+  moongoon:
+    github: elbywan/moongoon
+#  redis:
+#    github: jgaskins/redis
+  blake3:
+    github: didactic-drunk/blake3.cr
+
+development_dependencies:
+  ameba:
+    github: veelenga/ameba
+
+# compile target
+targets:
+  app:
+    main: src/app.cr
