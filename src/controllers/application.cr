@@ -10,6 +10,8 @@ abstract class Application < ActionController::Base
   before_action :set_request_id
   before_action :set_date_header
 
+  after_action :set_codepage
+
   # This makes it simple to match client requests with server side logs.
   # When building microservices this ID should be propagated to upstream services.
   def set_request_id
@@ -28,5 +30,9 @@ abstract class Application < ActionController::Base
 
   def set_date_header
     response.headers["Date"] = HTTP.format_time(Time.utc)
+  end
+
+  def set_codepage
+    response.headers["Content-Type"] += "; charset=utf-8"
   end
 end

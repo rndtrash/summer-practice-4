@@ -403,18 +403,11 @@ color: var(--md-sys-color-on-background);
 
 <body class="body1">
 	<nav>
-		<a class="button icon" href="#all" id="all" title="Все пользователи">
+		<a class="button icon" href="#users" id="users" title="Все пользователи">
 			<span class="material-icons-conditional">
 				person
 			</span>
 			Люди
-			<div class="ripple"></div>
-		</a>
-		<a class="button icon" href="#search" id="search" title="Поиск по базе данных">
-			<span class="material-icons-conditional">
-				search
-			</span>
-			Поиск
 			<div class="ripple"></div>
 		</a>
 		<a class="button icon" href="#import" id="import" title="Импорт пользователей">
@@ -440,60 +433,35 @@ color: var(--md-sys-color-on-background);
 		</a>
 	</nav>
 	<main>
-		<section id="section-all">
+		<section id="section-users">
 			<table class="fullscreen">
-				<thead>
+				<thead class="fixed">
 					<tr>
-						<th id="all-0" class="active" onclick="switchSortAll(this)">Фамилия<span class="material-icons">arrow_downward</span></th>
-						<th id="all-1">Имя<span class="material-icons"></span></th>
-						<th id="all-2">Отчество<span class="material-icons"></span></th>
-						<th id="all-3">Номер телефона<span class="material-icons"></span></th>
-						<th id="all-4">E-Mail<span class="material-icons"></span></th>
-						<th id="all-5">Логин<span class="material-icons"></span></th>
+						<th data-column="last-name" class="active" onclick="sort(this)">Фамилия<span class="material-icons">arrow_downward</span></th>
+						<th data-column="first-name" onclick="sort(this)">Имя<span class="material-icons"></span></th>
+						<th data-column="middle-name" onclick="sort(this)">Отчество<span class="material-icons"></span></th>
+						<th data-column="phone-number" onclick="sort(this)">Номер телефона<span class="material-icons"></span></th>
+						<th data-column="email" onclick="sort(this)">E-Mail<span class="material-icons"></span></th>
+						<th data-column="login" onclick="sort(this)">Логин<span class="material-icons"></span></th>
 					</tr>
 				</thead>
-				<tbody id="tbody-all">
+				<tbody id="users-table">
 				</tbody>
 			</table>
 		</section>
-		<section id="section-search">
-			<h1 class="headline1">Playing CTF for 25 hours.</h1>
-			<div class="table-wrapper">
-				<table>
-					<thead>
-						<tr>
-							<th class="team1"><div class="cell-container"><span class="name">Cool guys</span><span>2-10</span></div></th>
-							<th class="team2"><div class="cell-container opposite"><span class="name">Not so cool guys</span><span>1-10</span></div></th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td class="no-padding">
-								<table id="team1">
-									<tr>
-										<td><div class="cell-container"><span class="material-icons">signal_cellular_alt_1_bar</span><span class="name">Deuce</span><span>10</span></div></td>
-										<td><div class="cell-container"><span class="material-icons">signal_cellular_alt_2_bar</span><span class="name">Deuce (2)</span><span>1</span></div></td>
-									</tr>
-								</table>
-							</td>
-							<td class="no-padding">
-								<table class="players opposite">
-									<tr>
-										<td><div class="cell-container"><span class="material-icons">signal_cellular_alt</span><span class="name">Deuce (1)</span><span>0</span></div></td>
-										<td><div class="cell-container"><span class="material-icons">signal_cellular_alt_2_bar</span><span class="name">Limbo</span><span>5</span></div></td>
-									</tr>
-								</table>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</section>
 		<section id="section-import">
 			<h1 class="headline1">Импорт данных</h1>
+			<p>Выберите файл формата .CSV с кодировкой UTF-8 и с разделёнными запятой столбцами, затем нажмите на кнопку "Отправить" для импорта данных.</p>
+			<input type="file" id="import-form" accept="text/csv, text/plain">
+			<div>
+				<input type="checkbox" id="clear-collection">
+				<label for="clear-collection">Также удалить все данные <strong>(ВНИМАНИЕ! Операция не обратима)</strong></label>
+			</div>
+			<button onclick="uploadCSV()">Отправить</button>
 		</section>
 		<section id="section-export">
 			<h1 class="headline1">Экспорт данных</h1>
+			<button onclick="downloadCSV()">Скачать</button>
 		</section>
 		<section id="section-info">
 			<h1 class="headline1">Summer Practice 4</h1>
@@ -503,18 +471,28 @@ color: var(--md-sys-color-on-background);
 		</section>
 	</main>
 
+	<div id="banner">
+		<div>
+			<h3 class="headline3" id="banner-title"></h3>
+			<span id="banner-content"></span>
+		</div>
+		<button onclick="hideBanner()">X</button>
+	</div>
+
 	<script>
 const buttons = document.querySelectorAll("nav>a");
 const sections = document.getElementsByTagName("section");
 
-let allSortDir = 0; // 0 - возрастание, 1 - убывание
-let allSortColumn = 'all-0';
+let sortDir = 0; // 0 - возрастание, 1 - убывание
+let sortColumn = 0;
 
-const id2dir = {'all-0': };
+const id2Col = {0: 'last-name', 1: 'first-name'};
 
-function switchSortAll()
+let allData = {};
+
+function switchSortAll(col)
 {
-
+	console.log(col);
 }
 
 function setSection(section = window.location.hash.substr(1))
@@ -557,11 +535,67 @@ function setNotifs(buttonId, count)
 	badge.setAttribute("data-badge-count", s);
 }
 
-function loadAbout()
+const banner = document.getElementById('banner'), bannerTitle = document.getElementById('banner-title'), bannerText = document.getElementById('banner-content');
+const bannerTTL = 5000; // миллисекунды
+let timeoutId;
+/*
+ * setBanner
+ *
+ * message: String
+ * status: ['', 'success', 'error'] = ''
+ */
+function setBanner(message, status = '')
+{
+	if (timeoutId !== undefined)
+		clearTimeout(timeoutId);
+
+	if (status == 'success')
+		bannerTitle.innerText = 'Великий успех!';
+	else if (status == 'error')
+		bannerTitle.innerText = 'Ошибка!';
+	else
+		bannerTitle.innerText = '';
+
+	bannerText.innerText = message;
+
+	banner.setAttribute('class', status);
+	banner.style.opacity = '1';
+	banner.style.pointerEvents = 'all';
+
+	timeoutId = setTimeout(() => hideBanner(), bannerTTL);
+}
+
+function hideBanner()
+{
+	banner.style.opacity = '0';
+	banner.style.pointerEvents = 'none';
+}
+
+function loadAbout() // TODO: заменить функционал
 {
 	fetch("/api/info")
 		.then((response) => response.json()) // turning that response into JSON first
 		.then((j) => {aboutData = j; renderAbout();});
+}
+
+function uploadCSV()
+{
+	const fileForm = document.getElementById('import-form'), clearCollection = document.getElementById('clear-collection').checked;
+	if (fileForm.files.length == 0)
+		return;
+
+	fetch('/api/import' + (clearCollection ? '?overwrite=1' : ''), {method: 'POST', body: fileForm.files[0]})
+		.then((response) => response.json())
+		.then((j) => {
+			console.log(j);
+			if (j['status'] == 'error' || j['accepted'] == 0)
+			{
+				setBanner('Ни один пользователь не был принят сервером.', 'error');
+				return;
+			}
+
+			setBanner('Сервер принял ' + j['accepted'] + ' записей о пользователях и отклонил ' + j['rejected'] + '.', 'success');
+		});
 }
 
 window.onload = () =>

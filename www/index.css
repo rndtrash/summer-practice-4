@@ -11,9 +11,6 @@
 --md-sys-state-hover-state-layer-opacity: 0.08;
 --md-sys-state-focus-state-layer-opacity: 0.24;
 --md-sys-state-press-state-layer-opacity: 0.24;
-
---default-team1-color: 255, 0, 0;
---default-team2-color: 0, 0, 255;
 }
 
 .material-icons-conditional
@@ -187,7 +184,7 @@ section.active
 display: block;
 }
 
-section#section-all
+section#section-users
 {
 padding: 0;
 }
@@ -214,7 +211,10 @@ overflow-x: auto;
 
 table
 {
-width: 100%;
+position: relative;
+
+min-width: 100%;
+height: 100%;
 
 table-layout: fixed;
 
@@ -227,24 +227,36 @@ thead
 vertical-align: baseline;
 }
 
-thead:first-child tr:first-child th,
-tbody:first-child tr:first-child td
+thead.fixed
 {
-border-top: 0;
+position: sticky;
+
+top: 0;
 }
 
-td:first-child,
-th:first-child
+tbody
 {
-border-left: 0;
+overflow-y: scroll;
+}
+
+thead:last-child tr:last-child th,
+tbody:last-child tr:last-child td
+{
+border-bottom: 0;
+}
+
+td:last-child,
+th:last-child
+{
+border-right: 0;
 }
 
 td,
 th
 {
 padding: 16px 24px;
-border-top: 1px solid var(--md-sys-color-surface-variant);
-border-left: 1px solid var(--md-sys-color-surface-variant);
+border-bottom: 1px solid var(--md-sys-color-surface-variant);
+border-right: 1px solid var(--md-sys-color-surface-variant);
 vertical-align: middle;
 }
 
@@ -259,21 +271,16 @@ background-color: var(--md-sys-color-surface);
 color: var(--md-sys-color-on-surface-variant);
 }
 
+th.active
+{
+background-color: var(--md-sys-color-surface-variant);
+}
+
 .cell-container
 {
 display: flex;
 justify-content: space-between;
 flex-flow: row nowrap;
-}
-
-th.team1
-{
-background-color: rgba(var(--team1-color, var(--default-team1-color)), 0.1);
-}
-
-th.team2
-{
-background-color: rgba(var(--team2-color, var(--default-team2-color)), 0.1);
 }
 
 span.name
@@ -293,6 +300,43 @@ text-align: right;
 .opposite span.name
 {
 text-align: right;
+}
+
+#banner
+{
+display: flex;
+flex-flow: row nowrap;
+
+position: absolute;
+top: 0;
+left: 0;
+
+width: 100%;
+
+background-color: var(--md-sys-color-surface-variant);
+color: var(--md-sys-color-on-surface-variant);
+
+transition: opacity 0.25s ease-out;
+
+opacity: 0;
+
+pointer-events: none;
+}
+
+#banner.error
+{
+background-color: var(--md-sys-color-error);
+color: var(--md-sys-color-on-error);
+}
+
+#banner > div
+{
+flex-grow: 1;
+
+padding: 0 16px;
+
+display: flex;
+flex-flow: column nowrap;
 }
 
 /****/
