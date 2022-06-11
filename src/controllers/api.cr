@@ -34,9 +34,9 @@ class API < Application
 
   get "/user", :get_user do
     unless params["login"]?.nil?
-      u = User.find_one({ login: params["login"] })
+      u = User.find_one({login: params["login"]})
 
-      render :bad_request, json: { "status": "error" } if u.nil?
+      render :bad_request, json: {"status": "error"} if u.nil?
 
       render json: u.to_frontend_json
     end
@@ -58,22 +58,14 @@ class API < Application
     sort = Hash(String, Int32).new
     unless params["sort"]?.nil?
       sortable_columns = {"last_name": nil, "first_name": nil, "middle_name": nil, "phone_number": nil, "email": nil, "login": nil}
-      render :bad_request, json: { "status": "error" } unless sortable_columns.has_key?(params["sort"])
+      render :bad_request, json: {"status": "error"} unless sortable_columns.has_key?(params["sort"])
       sort[params["sort"]] = params["reverse"]?.nil? ? 1 : -1
     end
 
     us = User.find(q, order_by: sort)
-    render :bad_request, json: { "status": "error" } if us.nil? || us.size == 0
+    render :bad_request, json: {"status": "error"} if us.nil? || us.size == 0
 
-    result = Array({
-      last_name: String,
-      first_name: String,
-      middle_name: String?,
-
-      phone_number: String,
-      email: String,
-      login: String
-    }).new
+    result = Array({last_name: String, first_name: String, middle_name: String?, phone_number: String, email: String, login: String}).new
 
     us.each do |user|
       result.push user.to_frontend_json
@@ -149,7 +141,7 @@ class API < Application
   get "/export", :export_users do
     result = ""
 
-    User.find().each do |u|
+    User.find.each do |u|
       result += u.to_csv + '\n'
     end
 

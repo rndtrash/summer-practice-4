@@ -9,15 +9,15 @@ require "../constants.cr"
 class User < Moongoon::Collection
   collection "users"
 
-  index keys: { login: 1 }, options: { unique: true }
+  index keys: {login: 1}, options: {unique: true}
 
-  property last_name : String # Фамилия
-  property first_name : String # Имя
+  property last_name : String    # Фамилия
+  property first_name : String   # Имя
   property middle_name : String? # Отчество (его может и не быть!)
 
   property phone_number : String # Номер телефона. Формат: +7-(xxx)-xxx-xx-xx
-  property email : String # Электронная почта. Формат: [A-Za-z0-9.+\-_]+@([a-z0-9]+\.)+[a-z]+
-  property login : String # Логин. Формат: [A-Za-z0-9.\-_]
+  property email : String        # Электронная почта. Формат: [A-Za-z0-9.+\-_]+@([a-z0-9]+\.)+[a-z]+
+  property login : String        # Логин. Формат: [A-Za-z0-9.\-_]
 
   property password_hash : String = ""
 
@@ -96,13 +96,13 @@ class User < Moongoon::Collection
   # на блюдечке с голубой каёмочкой
   def to_frontend_json
     {
-      last_name: @last_name,
-      first_name: @first_name,
+      last_name:   @last_name,
+      first_name:  @first_name,
       middle_name: @middle_name,
 
       phone_number: @phone_number,
-      email: @email,
-      login: @login
+      email:        @email,
+      login:        @login,
     }
   end
 end
