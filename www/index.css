@@ -36,7 +36,7 @@ display:flex;
 flex-flow: row nowrap;
 }
 
-nav
+body>nav
 {
 background-color: var(--md-sys-color-surface);
 color: var(--md-sys-color-on-surface);
@@ -165,6 +165,66 @@ nav .button.icon:active > .ripple
 opacity: var(--md-sys-state-press-state-layer-opacity);
 }
 
+nav.fabs
+{
+position: absolute;
+bottom: 0;
+right: 0;
+
+display: flex;
+flex-flow: column nowrap;
+align-items: center;
+}
+
+button.fab
+{
+appearance: none;
+border: none;
+
+background-color: var(--md-sys-color-primary-container);
+color: var(--md-sys-color-on-primary-container);
+
+width: 56px;
+height: 56px;
+
+margin: 16px;
+
+border-radius: 16px;
+}
+
+button.fab > span
+{
+font-size: 24px;
+line-height: 24px;
+
+width: 24px;
+height: 24px;
+}
+
+button.fab.small
+{
+width: 40px;
+height: 40px;
+
+margin: 8px;
+/*padding: 12px;*/
+
+border-radius: 12px;
+}
+
+/*button.fab.small + button.fab
+{
+padding-top: 16px;
+}*/
+
+button.fab.extended
+{
+width: auto;
+min-width: 80px;
+
+padding: 16px;
+}
+
 main
 {
 flex-grow: 1;
@@ -172,19 +232,25 @@ flex-grow: 1;
 overflow-y: auto;
 }
 
-section
+main > section
 {
+position: relative;
+
 display: none;
 
 padding: 12px;
+
+min-height: 100%;
+
+box-sizing: border-box;
 }
 
-section.active
+main > section.active
 {
 display: block;
 }
 
-section#section-users
+main > section#section-users
 {
 padding: 0;
 }
@@ -269,6 +335,8 @@ th
 {
 background-color: var(--md-sys-color-surface);
 color: var(--md-sys-color-on-surface-variant);
+
+user-select: none;
 }
 
 th.active
@@ -295,6 +363,11 @@ table.opposite .cell-container
 {
 flex-flow: row-reverse nowrap;
 text-align: right;
+}
+
+tr
+{
+cursor: pointer;
 }
 
 .opposite span.name
@@ -329,6 +402,12 @@ background-color: var(--md-sys-color-error);
 color: var(--md-sys-color-on-error);
 }
 
+#banner.success
+{
+background-color: var(--md-sys-color-primary-container);
+color: var(--md-sys-color-on-primary-container);
+}
+
 #banner > div
 {
 flex-grow: 1;
@@ -337,6 +416,57 @@ padding: 0 16px;
 
 display: flex;
 flex-flow: column nowrap;
+}
+
+form
+{
+display: flex;
+flex-flow: column nowrap;
+gap: 1vmin;
+}
+
+form > section
+{
+display: flex;
+flex-flow: row nowrap;
+gap: 1vmin;
+}
+
+form > section > label
+{
+flex-grow: 1;
+margin: auto 0;
+}
+
+.modal
+{
+display: none;
+
+position: absolute;
+top: 0;
+left: 0;
+
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.1);
+}
+
+.modal.active
+{
+display: block;
+}
+
+.modal > div
+{
+margin: auto;
+
+min-width: 50%;
+min-height: 50%;
+
+background: var(--md-sys-color-surface);
+color: var(--md-sys-color-on-surface);
+
+padding: 24px;
 }
 
 /****/
@@ -353,7 +483,7 @@ body
 flex-flow: column-reverse;
 }
 
-nav
+body > nav
 {
 flex-flow: row nowrap;
 gap: 0;

@@ -437,17 +437,65 @@ color: var(--md-sys-color-on-background);
 			<table class="fullscreen">
 				<thead class="fixed">
 					<tr>
-						<th data-column="last-name" class="active" onclick="sort(this)">Фамилия<span class="material-icons">arrow_downward</span></th>
-						<th data-column="first-name" onclick="sort(this)">Имя<span class="material-icons"></span></th>
-						<th data-column="middle-name" onclick="sort(this)">Отчество<span class="material-icons"></span></th>
-						<th data-column="phone-number" onclick="sort(this)">Номер телефона<span class="material-icons"></span></th>
-						<th data-column="email" onclick="sort(this)">E-Mail<span class="material-icons"></span></th>
-						<th data-column="login" onclick="sort(this)">Логин<span class="material-icons"></span></th>
+						<th data-column="last_name" onclick="sort(this)">Фамилия</th>
+						<th data-column="first_name" onclick="sort(this)">Имя</th>
+						<th data-column="middle_name" onclick="sort(this)">Отчество</th>
+						<th data-column="phone_number" onclick="sort(this)">Номер телефона</th>
+						<th data-column="email" onclick="sort(this)">E-Mail</th>
+						<th data-column="login" onclick="sort(this)">Логин</th>
 					</tr>
 				</thead>
 				<tbody id="users-table">
 				</tbody>
 			</table>
+			<nav class="fabs">
+				<button class="fab small"><span class="material-icons">add</span></button>
+				<button class="fab small"><span class="material-icons">close</span></button>
+				<button class="fab extended"><span class="material-icons">search</span>Поиск</button>
+			</nav>
+			<div class="modal" id="user-modal">
+				<div>
+					<button onclick="closeUserModal()" class="material-icons">close</button>
+					<form onsubmit="submitUser(); return false;">
+						<section>
+							<label for="user-last-name">Фамилия:</label>
+							<input id="user-last-name" type="text" pattern="[А-ЯЁ][а-яё]+(-[А-ЯЁ][а-яё]+)?" required>
+						</section>
+						<section>
+							<label for="user-first-name">Имя:</label>
+							<input id="user-first-name" type="text" pattern="[А-ЯЁ][а-яё]+(-[а-яё]+)?" required>
+						</section>
+						<section>
+							<label for="user-middle-name">Отчество:</label>
+							<input id="user-middle-name" type="text" pattern="[А-ЯЁ][а-яё]+(-[А-ЯЁ][а-яё]+)?">
+						</section>
+						<section>
+							<label for="user-phone-number">Номер телефона:</label>
+							<input id="user-phone-number" type="tel" pattern="\+7-\([0-9]{3}\)-[0-9]{3}(-[0-9]{2}){2}" required>
+						</section>
+						<section>
+							<label for="user-email">Электронная почта:</label>
+							<input id="user-email" type="email" required>
+						</section>
+						<section>
+							<label for="user-login">Логин:</label>
+							<input id="user-login" type="login" pattern="[A-Za-z0-9.\-_]+" readonly>
+						</section>
+						<section>
+							<label for="user-password">Старый пароль:</label>
+							<input id="user-password" type="password" pattern="[A-ZА-ЯЁa-zа-яё0-9!@#$%^&*()_+\-=]+" minlength="8" required>
+						</section>
+						<section>
+							<label for="user-new-password">Новый пароль:</label>
+							<input id="user-new-password" type="password" minlength="8">
+						</section>
+						<section>
+							<label></label>
+							<button id="user-submit">Изменить</button>
+						</section>
+					</form>
+				</div>
+			</div>
 		</section>
 		<section id="section-import">
 			<h1 class="headline1">Импорт данных</h1>
@@ -467,7 +515,7 @@ color: var(--md-sys-color-on-background);
 			<h1 class="headline1">Summer Practice 4</h1>
 			<h5 class="headline5">Сделано Иваном Кузьменко и Дмитрием Тихоновым из группы 16/2 в 2022 году.</h2>
 			<p>Основано на фронтенде, сделанном для проекта <a href="https://github.com/SpadesX/SpadesX">SpadesX</a> мною же.</p>
-			<p>Как фронтенд, так и бэкенд распространяется под лицензией <strong>GNU AGPLv3</strong>. Используется шрифт эмодзи от Google.</p>
+			<p>Как фронтенд, так и бэкенд распространяется под лицензией <strong>GNU AGPLv3</strong>. Используется шрифт иконок от Google.</p>
 		</section>
 	</main>
 
@@ -476,17 +524,29 @@ color: var(--md-sys-color-on-background);
 			<h3 class="headline3" id="banner-title"></h3>
 			<span id="banner-content"></span>
 		</div>
-		<button onclick="hideBanner()">X</button>
+		<button onclick="hideBanner()" class="material-icons">close</button>
 	</div>
 
 	<script>
-const buttons = document.querySelectorAll("nav>a");
+const buttons = document.querySelectorAll("body>nav>a");
 const sections = document.getElementsByTagName("section");
+const usersTable = document.getElementById("users-table");
+const userModal = document.getElementById("user-modal");
+
+const UlastName = document.getElementById("user-last-name");
+const UfirstName = document.getElementById("user-first-name");
+const UmiddleName = document.getElementById("user-middle-name");
+const UphoneNumber = document.getElementById("user-phone-number");
+const Uemail = document.getElementById("user-email");
+const Ulogin = document.getElementById("user-login");
+const Upassword = document.getElementById("user-password");
+const UnewPassword = document.getElementById("user-new-password");
+const Usubmit = document.getElementById("user-submit");
+
+let Umode = "new"; // "new" - новый пользователь, "edit" - редактирование существующего
 
 let sortDir = 0; // 0 - возрастание, 1 - убывание
-let sortColumn = 0;
-
-const id2Col = {0: 'last-name', 1: 'first-name'};
+let sortColumn = 'last_name';
 
 let allData = {};
 
@@ -571,11 +631,48 @@ function hideBanner()
 	banner.style.pointerEvents = 'none';
 }
 
-function loadAbout() // TODO: заменить функционал
+function loadUsers()
 {
-	fetch("/api/info")
-		.then((response) => response.json()) // turning that response into JSON first
-		.then((j) => {aboutData = j; renderAbout();});
+	fetch("/api/user" + (sortColumn != "" ? "?sort=" + sortColumn + (sortDir == 1 ? "&reverse=" : "") : ""))
+		.then((response) => response.json())
+		.then((j) => {
+			usersTable.innerHTML = '';
+			j.forEach((user) => {
+				let el = usersTable.insertRow(-1);
+				for (const [key, value] of Object.entries(user))
+				{
+					let cell = el.insertCell(-1);
+					cell.innerText = value;
+				}
+				el.onclick = (e) => {loadUser(user.login);};
+			});
+		});
+}
+
+function loadUser(login)
+{
+	fetch("/api/user?login=" + encodeURI(login))
+		.then((response) => response.json())
+		.then((j) => {renderUser(j);});
+}
+
+function renderUser(user)
+{
+	Umode = "edit";
+
+	UlastName.value = user.last_name;
+	UfirstName.value = user.first_name;
+	UmiddleName.value = user.middle_name;
+	UphoneNumber.value = user.phone_number;
+	Uemail.value = user.email;
+	Ulogin.value = user.login;
+
+	userModal.style.display = "block";
+}
+
+function closeUserModal()
+{
+	userModal.style.display = "none";
 }
 
 function uploadCSV()
@@ -598,9 +695,103 @@ function uploadCSV()
 		});
 }
 
+function downloadCSV()
+{
+	fetch('/api/export')
+		.then((response) => response.text())
+		.then((t) => {
+			console.log(t);
+			if (t.length == 0)
+			{
+				setBanner('База данных пуста.', 'error');
+				return;
+			}
+
+			let element = document.createElement('a');
+			element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(t));
+			element.setAttribute('download', 'users.csv');
+
+			element.style.display = 'none';
+			document.body.appendChild(element);
+
+			element.click();
+
+			document.body.removeChild(element);
+
+			setBanner('Сохранено ' + (t.match(/\n/g) || '').length + ' записей о пользователях', 'success');
+		});
+}
+
+function sort(el)
+{
+	console.log(el.dataset.column);
+	sortDir = el.dataset.column == sortColumn ? 1 - sortDir : 0;
+	sortColumn = el.dataset.column;
+	renderSort();
+	loadUsers();
+}
+
+function renderSort()
+{
+	document.querySelectorAll("th.active>span.material-icons").forEach((e)=>e.remove());
+	document.querySelectorAll("th.active").forEach((e)=>e.classList.remove("active"));
+	let col = document.querySelectorAll("th[data-column=\"" + sortColumn + "\"]")[0];
+	col.classList.add("active");
+	col.insertAdjacentHTML("beforeend", "<span class=material-icons>" + (sortDir == 0 ? "arrow_upward" : "arrow_downward") + "</span>");
+}
+
+function validateForm()
+{
+	let passwordValid = UnewPassword.value.length == 0
+		|| UnewPassword.value.length >= 8
+		&& UnewPassword.value.match(/[A-ZА-ЯЁ]/) !== undefined
+		&& UnewPassword.value.match(/[a-zа-яё]/) !== undefined
+		&& UnewPassword.value.match(/[0-9]/) !== undefined
+		&& UnewPassword.value.match(/[!@#$%^&*()_+\-=]/) !== undefined;
+
+	if (!passwordValid)
+	{
+		UnewPassword.setCustomValidity("Пароль должен быть длинее 8 символов, иметь хотя бы одну заглавную букву, строчную букву, цифру и специальный символ.");
+	}
+	else
+	{
+		UnewPassword.setCustomValidity("");
+	}
+}
+
+function submitUser()
+{
+	fetch("/api/user/update", {method: 'PUT', body:
+		JSON.stringify({
+			last_name: UlastName.value,
+			first_name: UfirstName.value,
+			middle_name: UmiddleName.value.length > 0 ? UmiddleName.value : null,
+			phone_number: UphoneNumber.value,
+			email: Uemail.value,
+			login: Ulogin.value,
+			password: Upassword.value,
+			new_password: UnewPassword.value.length > 0 ? UnewPassword.value : null
+		})})
+		.then((response) => response.json())
+		.then((j) => {
+			console.log(j);
+			if (j['status'] == 'error' || j['accepted'] == 0)
+			{
+				setBanner('Не удалось обновить данные пользователя \"' + Ulogin.value + '\"!', 'error');
+				return;
+			}
+			setBanner('Успешно обновлены данные пользователя \"' + Ulogin.value + '\".', 'success');
+			loadUsers();
+			closeUserModal();
+		});
+}
+
 window.onload = () =>
 {
-	//loadAbout();
+	UnewPassword.addEventListener("input", (event) => validateForm());
+
+	renderSort();
+	loadUsers();
 };
 
 buttons.forEach((button)=>{button.onclick=()=>setSection(button.id)});

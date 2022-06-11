@@ -29,7 +29,6 @@ class User < Moongoon::Collection
     # * как минимум одна цифра
     # * как минимум один специальный символ
     return false if password.bytesize < 8 || /[A-ZА-ЯЁ]/.match(password).nil? || /[a-zа-яё]/.match(password).nil? || /[0-9]/.match(password).nil? || /[!@#$%^&*()_+\-=]/.match(password).nil?
-    Log.info {"password ok"}
 
     digest = Digest::Blake3.new
     digest.update password
@@ -93,7 +92,9 @@ class User < Moongoon::Collection
     "#{@last_name},#{@first_name},#{@middle_name},#{@phone_number},#{@email},#{@login},#{@password_hash}"
   end
 
-  def to_frontend_json # Функция, выводящая общеизвестную информацию о пользователе. На данный момент бесполезна ибо любой желающий может экспортировать *всю* базу в CSV на блюдечке с голубой каёмочкой
+  # Функция, выводящая общеизвестную информацию о пользователе. На данный момент бесполезна ибо любой желающий может получить *всю* базу в CSV
+  # на блюдечке с голубой каёмочкой
+  def to_frontend_json
     {
       last_name: @last_name,
       first_name: @first_name,
