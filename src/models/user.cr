@@ -85,7 +85,7 @@ class User < Moongoon::Collection
       return nil
     end
 
-    return u
+    u
   end
 
   def to_csv : String

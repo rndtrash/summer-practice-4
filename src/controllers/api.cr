@@ -65,13 +65,6 @@ class API < Application
     us = User.find(q, order_by: sort)
     render :bad_request, json: { "status": "error" } if us.nil? || us.size == 0
 
-#    result = ""
-
-#    us.each do |u|
-#      result += u.to_csv + '\n'
-#    end
-
-#    render text: result
     result = Array({
       last_name: String,
       first_name: String,
@@ -82,8 +75,8 @@ class API < Application
       login: String
     }).new
 
-    us.each do |u|
-      result.push u.to_frontend_json
+    us.each do |user|
+      result.push user.to_frontend_json
     end
 
     render json: result
