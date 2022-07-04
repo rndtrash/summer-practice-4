@@ -8,7 +8,7 @@ module App
   VERSION = {{ `shards version "#{__DIR__}"`.chomp.stringify.downcase }}
 
   MONGODB_URI = ENV["SP4_MONGODB_URI"]? || "mongodb://localhost:27017"
-  MONGODB_DB  = ENV["SP4_MONGODB_AUTH_DB"]? || "sp4"
+  MONGODB_DB  = ENV["SP4_MONGODB_DB"]? || "sp4"
 
   Log         = ::Log.for(NAME)
   LOG_BACKEND = ActionController.default_backend
@@ -24,11 +24,11 @@ module App
   COOKIE_SESSION_KEY    = ENV["COOKIE_SESSION_KEY"]? || "_sp4_"
   COOKIE_SESSION_SECRET = ENV["COOKIE_SESSION_SECRET"]? || Random::Secure.hex
 
-  REGEX_LAST_MIDDLE_NAME = /[А-ЯЁ][а-яё]+(-[А-ЯЁ][а-яё]+)?/
-  REGEX_FIRST_NAME       = /[А-ЯЁ][а-яё]+(-[а-яё]+)?/
-  REGEX_PHONE_NUMBER     = /\+7-\([0-9]{3}\)-[0-9]{3}(-[0-9]{2}){2}/
-  REGEX_EMAIL            = /[A-Za-z0-9.+\-_]+@([a-z0-9]+\.)+[a-z]+/
-  REGEX_LOGIN            = /[A-Za-z0-9.\-_]+/
+  REGEX_LAST_MIDDLE_NAME = /^[А-ЯЁ][а-яё]+(-[А-ЯЁ][а-яё]+)?$/
+  REGEX_FIRST_NAME       = /^[А-ЯЁ][а-яё]+(-[а-яё]+)?$/
+  REGEX_PHONE_NUMBER     = /^\+7-\([0-9]{3}\)-[0-9]{3}(-[0-9]{2}){2}$/
+  REGEX_EMAIL            = /^[A-Za-z0-9.+\-_]+@([a-z0-9]+\.)+([a-z])+$/
+  REGEX_LOGIN            = /^[A-Za-z0-9.\-_]+$/
 
   def self.running_in_production?
     ENVIRONMENT == "production"

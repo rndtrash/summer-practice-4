@@ -33,6 +33,8 @@ abstract class Application < ActionController::Base
   end
 
   def set_codepage
-    response.headers["Content-Type"] += "; charset=utf-8"
+    unless response.headers["Content-Type"]?.nil?
+      response.headers["Content-Type"] += "; charset=utf-8"
+    end
   end
 end

@@ -8,14 +8,17 @@ class API < Application
   base "/api"
 
   rescue_from NilAssertionError do |_error|
+    Log.debug { _error }
     render :bad_request, json: {"status": "error"}
   end
 
   rescue_from KeyError do |_error|
+    Log.debug { _error }
     render :bad_request, json: {"status": "error"}
   end
 
   rescue_from Mongo::Error::CommandWrite do |_error|
+    Log.debug { _error }
     render :bad_request, json: {"status": "error"}
   end
 

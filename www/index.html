@@ -449,9 +449,9 @@ color: var(--md-sys-color-on-background);
 				</tbody>
 			</table>
 			<nav class="fabs">
-				<button class="fab small"><span class="material-icons">add</span></button>
-				<button class="fab small"><span class="material-icons">close</span></button>
-				<button class="fab extended"><span class="material-icons">search</span>Поиск</button>
+				<button class="fab small" id="add-user" onclick="renderNewUser()"><span class="material-icons">add</span></button>
+				<button class="fab small" id="close-search" style="display: none"><span class="material-icons">close</span></button>
+				<button class="fab extended" id="search" style="display: none"><span class="material-icons">search</span>Поиск</button>
 			</nav>
 			<div class="modal" id="user-modal">
 				<div>
@@ -482,15 +482,17 @@ color: var(--md-sys-color-on-background);
 							<input id="user-login" type="login" pattern="[A-Za-z0-9.\-_]+" readonly>
 						</section>
 						<section>
-							<label for="user-password">Старый пароль:</label>
+							<label for="user-password">Пароль:</label>
 							<input id="user-password" type="password" pattern="[A-ZА-ЯЁa-zа-яё0-9!@#$%^&*()_+\-=]+" minlength="8" required>
 						</section>
-						<section>
+						<section id="form-section-new-password">
 							<label for="user-new-password">Новый пароль:</label>
 							<input id="user-new-password" type="password" minlength="8">
 						</section>
 						<section>
-							<label></label>
+							<label><input type="text" placeholder="Текст уведомления по E-Mail"></input></label>
+							<button type="button" id="user-send-email" onclick="sendMail()">Отправить E-Mail</button>
+							<button type="button" id="user-delete" onclick="deleteUser()">УДАЛИТЬ <strong>(НЕОБРАТИМО!)</strong></button>
 							<button id="user-submit">Изменить</button>
 						</section>
 					</form>
@@ -542,6 +544,8 @@ const Ulogin = document.getElementById("user-login");
 const Upassword = document.getElementById("user-password");
 const UnewPassword = document.getElementById("user-new-password");
 const Usubmit = document.getElementById("user-submit");
+
+const FSnewPassword = document.getElementById("form-section-new-password");
 
 let Umode = "new"; // "new" - новый пользователь, "edit" - редактирование существующего
 
@@ -636,6 +640,11 @@ function loadUsers()
 	fetch("/api/user" + (sortColumn != "" ? "?sort=" + sortColumn + (sortDir == 1 ? "&reverse=" : "") : ""))
 		.then((response) => response.json())
 		.then((j) => {
+			if (j['status'] == 'error')
+			{
+				setBanner('Список пользователей пуст.');
+				return;
+			}
 			usersTable.innerHTML = '';
 			j.forEach((user) => {
 				let el = usersTable.insertRow(-1);
@@ -656,6 +665,17 @@ function loadUser(login)
 		.then((j) => {renderUser(j);});
 }
 
+function renderNewUser()
+{
+	Umode = "new";
+
+	UlastName.value = UfirstName.value = UmiddleName.value = UphoneNumber.value = Uemail.value = Ulogin.value = Upassword.value = "";
+
+	Ulogin.removeAttribute("readonly");
+	FSnewPassword.style.display = "none";
+	userModal.style.display = "block";
+}
+
 function renderUser(user)
 {
 	Umode = "edit";
@@ -667,6 +687,8 @@ function renderUser(user)
 	Uemail.value = user.email;
 	Ulogin.value = user.login;
 
+	Ulogin.setAttribute("readonly", true);
+	FSnewPassword.style.display = "flex";
 	userModal.style.display = "block";
 }
 
@@ -684,7 +706,6 @@ function uploadCSV()
 	fetch('/api/import' + (clearCollection ? '?overwrite=1' : ''), {method: 'POST', body: fileForm.files[0]})
 		.then((response) => response.json())
 		.then((j) => {
-			console.log(j);
 			if (j['status'] == 'error' || j['accepted'] == 0)
 			{
 				setBanner('Ни один пользователь не был принят сервером.', 'error');
@@ -692,6 +713,7 @@ function uploadCSV()
 			}
 
 			setBanner('Сервер принял ' + j['accepted'] + ' записей о пользователях и отклонил ' + j['rejected'] + '.', 'success');
+			loadUsers();
 		});
 }
 
@@ -761,29 +783,77 @@ function validateForm()
 
 function submitUser()
 {
-	fetch("/api/user/update", {method: 'PUT', body:
-		JSON.stringify({
-			last_name: UlastName.value,
-			first_name: UfirstName.value,
-			middle_name: UmiddleName.value.length > 0 ? UmiddleName.value : null,
-			phone_number: UphoneNumber.value,
-			email: Uemail.value,
-			login: Ulogin.value,
-			password: Upassword.value,
-			new_password: UnewPassword.value.length > 0 ? UnewPassword.value : null
-		})})
+	if (Umode == "new")
+	{
+		fetch("/api/user/new", {method: 'POST', body:
+			JSON.stringify({
+				last_name: UlastName.value,
+				first_name: UfirstName.value,
+				middle_name: UmiddleName.value.length > 0 ? UmiddleName.value : null,
+				phone_number: UphoneNumber.value,
+				email: Uemail.value,
+				login: Ulogin.value,
+				password: Upassword.value
+			})})
+			.then((response) => response.json())
+			.then((j) => {
+				console.log(j);
+				if (j['status'] == 'error' || j['accepted'] == 0)
+				{
+					setBanner('Не удалось создать пользователя \"' + Ulogin.value + '\"!', 'error');
+					return;
+				}
+				setBanner('Успешно создан пользователь \"' + Ulogin.value + '\".', 'success');
+				loadUsers();
+				closeUserModal();
+			});
+	}
+	else
+	{
+		fetch("/api/user/update", {method: 'PUT', body:
+			JSON.stringify({
+				last_name: UlastName.value,
+				first_name: UfirstName.value,
+				middle_name: UmiddleName.value.length > 0 ? UmiddleName.value : null,
+				phone_number: UphoneNumber.value,
+				email: Uemail.value,
+				login: Ulogin.value,
+				password: Upassword.value,
+				new_password: UnewPassword.value.length > 0 ? UnewPassword.value : null
+			})})
+			.then((response) => response.json())
+			.then((j) => {
+				if (j['status'] == 'error' || j['accepted'] == 0)
+				{
+					setBanner('Не удалось обновить данные пользователя \"' + Ulogin.value + '\"!', 'error');
+					return;
+				}
+				setBanner('Успешно обновлены данные пользователя \"' + Ulogin.value + '\".', 'success');
+				loadUsers();
+				closeUserModal();
+			});
+	}
+}
+
+function deleteUser()
+{
+	fetch(`/api/user/delete?login=${Ulogin.value}&password=${Upassword.value}`, {method: 'GET'})
 		.then((response) => response.json())
 		.then((j) => {
-			console.log(j);
-			if (j['status'] == 'error' || j['accepted'] == 0)
+			if (j['status'] == 'error')
 			{
-				setBanner('Не удалось обновить данные пользователя \"' + Ulogin.value + '\"!', 'error');
+				setBanner('Отказано в доступе. Скорее всего, неправильный пароль.', 'error');
 				return;
 			}
-			setBanner('Успешно обновлены данные пользователя \"' + Ulogin.value + '\".', 'success');
+			setBanner('Успешно удалены данные пользователя \"' + Ulogin.value + '\".', 'success');
 			loadUsers();
 			closeUserModal();
 		});
+}
+
+function sendMail()
+{
+	setBanner('Отсутствует соединение с интернетом или поставщик услуг E-Mail заблокировал этот сервер :(', 'error');
 }
 
 window.onload = () =>
